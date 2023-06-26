@@ -68,7 +68,8 @@ public class Assembler {
         String[] compAndJump = compJump.split(";");
         String comp = compAndJump[0];
         String jump = compAndJump.length > 1 ? compAndJump[1] : "";
-        String binary = "111" + destDict.get(dest) + compDict.get(comp) + jumpDict.get(jump);
+        String binary = "111" + compDict.get(comp) +  destDict.get(dest) +jumpDict.get(jump);
+        
         return binary;
     }
 
@@ -118,8 +119,6 @@ public class Assembler {
         ArrayList<String> labels = new ArrayList<>();
         ArrayList<String> aInstructions = new ArrayList<>();
         ArrayList<String> modifiedNoWhiteSpace = new ArrayList<>();
-        ArrayList<String> aInstructionsBinary = new ArrayList<>();
-        ArrayList<String> cInstructionBinary = new ArrayList<>();
         ArrayList<String> hackFile = new ArrayList<>();
 
         HashMap<String, Integer> symbolTable = new HashMap<>();
@@ -141,12 +140,16 @@ public class Assembler {
             }
             noWhiteSpace.add(v);
         }
+
+        System.out.println(noWhiteSpace);
         
         for (String s : noWhiteSpace) {
             s = s.replaceAll("[\\[\\]\\(\\)\\'\\ ]", "");
             noLblBrackets.addAll(Arrays.asList(s.split(",")));
         }     
         
+        //System.out.println(noLblBrackets);
+
         int lbl=0;
         for(String s : noWhiteSpace){
             if (s.charAt(0)=='('){
@@ -157,6 +160,8 @@ public class Assembler {
             }
         }
 
+        //System.out.println(labels);
+
         for (String s : noWhiteSpace){
             if (s.charAt(0)=='@'){
                 s = s.replace("@", "");
@@ -165,12 +170,14 @@ public class Assembler {
                     if (!numbersForAins.contains(s) && !symnVar.contains(s)) {
                         symnVar.add(s);
                     }
-                    if (!numbersForAins.contains(s) && !labels.contains(s) && preDefinedSymbols.contains(s) && unqLbls.containsKey(s)){
+                    if (!numbersForAins.contains(s) && !labels.contains(s) && !preDefinedSymbols.contains(s) && !unqLbls.containsKey(s)){
                         preDefinedSymbols.add(s);
                     }
                 }
             }
         }
+
+        //System.out.println(preDefinedSymbols);
         
         for (String s:symnVar){
             if (preDefinedSymbols.contains(s)){
@@ -185,6 +192,10 @@ public class Assembler {
             }
         }
 
+        //System.out.println(unqLbls);
+
+        //System.out.println(symbolTable);
+
         for (String s:noWhiteSpace){
             if (s.contains("(")){continue;}
             if (s.contains("@")){
@@ -197,7 +208,6 @@ public class Assembler {
                     Abin = Abin+"0";
                 }
                 Abin = Abin + aBin;
-                aInstructionsBinary.add(Abin);
                 hackFile.add(Abin);
                 s = '@' + s;
             }
@@ -216,6 +226,5 @@ public class Assembler {
         }
         Hfile.close();;
         
-
     }
 }
